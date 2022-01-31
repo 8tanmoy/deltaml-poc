@@ -1,0 +1,77 @@
+*malon md in sol
+*tanmoy
+*
+!++++ DO NOT CHANGE TITLE ++++ SED IS HARD CODED ++++
+
+!--load topology for small molecules--
+set t /projectnb/cui-buchem/tanmoy/projects/toppar
+
+read rtf card name @t/top_all36_cgenff.rtf
+read para card flex name @t/par_all36_cgenff.prm
+stream @t/toppar_water_ions.str
+
+set ii _PART_
+read psf card name          fixed_solute_md/frames_@ii.psf
+!read coor card name        fixed_solute_md/frames_@ii.cor
+open read unit 22 file name fixed_solute_md/frames_@ii.dcd
+
+trajectory firstu 22 nunit 1 skip 0
+
+set jj 0
+set jmax 500
+
+open write card unit 23 name en_dft_@ii.dat
+SYSTEM "rm forces_dft.dat forces_ma_dft.dat"
+
+label loop
+    read psf card name fixed_solute_md/frames_@ii.psf
+    traj read
+    
+        !<<<<<<<< WARNING >>>>>>>>
+        ! the if clause is necessary because charmm makes the coordinates of the fixed atom 99999 from 2nd frame
+
+        if jj eq 0 then
+            coor statistics sele segid MADH .and. type C2 end
+            set xfix ?XAVE
+            set yfix ?YAVE
+            set zfix ?ZAVE
+        else
+            coor set XDIR @xfix YDIR @yfix ZDIR @zfix sele segid MADH .and. type C2 end
+        endif
+
+        print coor sele .not. initialized end
+        calc radius = ( _RNUM_ * 0.2)
+        !-- set cutoff radius and cut --
+        dele atom sele .byres. (segid SOL .and. type OH2 .and. .not. -
+            (point 0.0 0.0 0.0 cut @radius) -
+            ) end
+
+        !=========================================================
+        ! DFT settings
+        !=========================================================
+
+        define qm sele segid MADH end
+        !______________________________________________________________
+        ENVI G09PROFILE   "/projectnb/cui-buchem/tanmoy/projects/g09profile"
+        ENVI G09EXE       "/usr/local/apps/gaussian-16.B.01/bin/g16"
+        ENVI G09FCHK      "/usr/local/apps/gaussian-16.B.01/bin/formchk"
+        ENVI G09CMD       "/projectnb/cui-buchem/tanmoy/projects/ML_delta/1_distance_convergence/b3lyp.g16cmd"
+        ENVI G09INP       "conf_dft"
+        ENVI GAUSS_SCRDIR "./"
+        !______________________________________________________________
+        GAUS remove sele qm end
+
+        energy
+        write title unit 23
+        * ?ENER
+
+        coor force comp
+        write coor comp card name temp_dft.dat
+        
+        SYSTEM "awk '{print $5, $6, $7}' temp_dft.dat | sed 1,3d >> forces_dft.dat"
+        SYSTEM "awk '{print $5, $6, $7}' temp_dft.dat | sed 1,3d | head -n 10 >> forces_ma_dft.dat"
+
+        dele atoms sele all end
+    incr jj by 1
+    if jj lt @jmax goto loop
+stop 

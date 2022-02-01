@@ -94,7 +94,7 @@ GENERATE MADH SETUP
 !__ set conf no __
 !set ii _NUM_
 set ii 70
-read coor pdb name xdd_@ii.pdb
+read coor pdb name ../data/xdd_@ii.pdb
 
 define SOLUTE sele all end
 print coor sele SOLUTE end

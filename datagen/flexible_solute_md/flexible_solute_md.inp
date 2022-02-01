@@ -111,7 +111,7 @@ set overlap 1.5
 bomlev -2
     read sequence tip3 1000
     gene SOL noangle nodihe
-    stream wat1000.str
+    stream ../data/wat1000.str
 
     !-- set cutoff radius and cut --
     dele atom sele .byres. (segid SOL .and. type OH2 .and. .not. -
@@ -233,7 +233,7 @@ write coor card name temp.cor
 bomlev -2
     read sequence tip3 1000
     gene SOL1 noangle nodihe
-    read coor card name wat1000.cor append
+    read coor card name ../data/wat1000.cor append
 
     !-- set cutoff radius and cut --
     dele atom sele .byres. (segid SOL1 .and. type OH2 .and. .not. -

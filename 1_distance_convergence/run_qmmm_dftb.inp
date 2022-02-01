@@ -31,12 +31,10 @@ label loop
         ! the if clause is necessary because charmm makes the coordinates of the fixed atom 99999 from 2nd frame
 
         if jj eq 0 then
-            coor statistics sele segid MADH .and. type C2 end
-            set xfix ?XAVE
-            set yfix ?YAVE
-            set zfix ?ZAVE
+            write coor card name solute_frm_dftb.cor
         else
-            coor set XDIR @xfix YDIR @yfix ZDIR @zfix sele segid MADH .and. type C2 end
+            read coor card name solute_frm_dftb.cor
+            print coor sele .not. initialized end
         endif
         
         print coor

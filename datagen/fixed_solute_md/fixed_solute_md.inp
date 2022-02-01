@@ -185,10 +185,11 @@ bomlev 0
 !           CUTNB 13.0  CTOFNB 12.0 CTONNB 8.0  WMIN 1.5  EPS 1.0 -
 !           inbfrq -1
 !   
-!   MMFP
-!   GEO  sphere quartic -
-!        force 200.0 droff 12.0 p1 2.25 select type OH2 end
-!   END
+
+MMFP
+GEO  sphere quartic -
+    force 400.0 droff 12.0 p1 2.25 select type OH2 end
+END
 
 energy
 
@@ -218,12 +219,15 @@ energy
 !   rxncor: umbrella name dd kumb 1000.0 del0 @xdd form 1
 !   rxncor: statistics name dd lowdelta 0.0 hidelta 0.0 deldel 0.0 start 0
 
+!============ shake ================
+shake bonh sele all end
+
 SCALAR FBETA SET 5.0 sele all end
 !============ for test =============
 dynamics leap LANGEVIN start nstep 50000 timestep 0.0001 -
     ILBFRQ 1000 RBUFFER 0.0 TBATH 300.0 -
     FIRSTT 300.0 FINALT 300.0  -
-    iprfrq 20000 -
+    iprfrq 1000 -
     INBFRQ 10 -
     IUNXYZ -1 IUNCRD -1 KUNIT -1
 
@@ -243,6 +247,14 @@ bomlev -2
     join SOL SOL1 renumber
 bomlev 0
 
+!============ shake ================
+shake bonh sele all end
+
+MMFP
+GEO  sphere quartic -
+    force 400.0 droff 12.0 p1 2.25 select type OH2 end
+END
+
 write psf card name frames_@ii.psf
 write coor card name frames_@ii.cor
 
@@ -252,14 +264,14 @@ open write card unit 19 name en_@ii.dat
 
 SCALAR FBETA SET 5.0 sele all end
 !============ for test =============
-dynamics leap LANGEVIN start nstep 2500000 timestep 0.0001 -
+dynamics leap LANGEVIN start nstep 1000000 timestep 0.0001 -
     ILBFRQ 1000 RBUFFER 0.0 TBATH 300.0 -
     FIRSTT 300.0 FINALT 300.0  -
-    iprfrq 20000 -
+    iprfrq 2000 -
     INBFRQ 10 -
-    mxyz 4 IUNXYZ 18 NSAVX 5000 - !write xyz 50000
-    IUNCRD 17 NSAVC 5000 -
-    KUNIT 19 NPRINT 5000 !write energy file 50000
+    mxyz 4 IUNXYZ 18 NSAVX 2000 - !write xyz 50000
+    IUNCRD 17 NSAVC 2000 -
+    KUNIT 19 NPRINT 2000 !write energy file 50000
 
 stop
 

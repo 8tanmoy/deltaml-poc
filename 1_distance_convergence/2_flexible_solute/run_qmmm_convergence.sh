@@ -5,8 +5,8 @@ do
     echo $ii
     mkdir part_${ii}
     cd part_${ii}
-    ln -s /projectnb/cui-buchem/tanmoy/projects/ML_delta/datagen/fixed_solute_md .
-    ln -s /projectnb/cui-buchem/tanmoy/projects/ML_delta/1_distance_convergence/sccdftb.dat .
+    ln -s /projectnb/cui-buchem/tanmoy/projects/ML_delta/datagen/flexible_solute_md ./trajdir
+    ln -s ../sccdftb.dat .
     ln -s /projectnb/cui-buchem/tanmoy/projects/water_clusters/parameters/3ob/3ob-3-1/ .
     sed "s/_PART_/${jj}/g" ../run_qmmm_dft.inp  | sed "s/_RNUM_/${ii}/g" > run_qmmm_dft.inp
     sed "s/_PART_/${jj}/g" ../run_qmmm_dftb.inp | sed "s/_RNUM_/${ii}/g" > run_qmmm_dftb.inp
